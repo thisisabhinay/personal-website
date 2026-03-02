@@ -1,0 +1,13 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`flex gap-4 text-sm font-medium ${className}`}>
+  <a href="https://github.com/abhinay-thakur" target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">GitHub</a>
+  <a href="https://linkedin.com/in/abhinaythakur" target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">LinkedIn</a>
+  <a href="https://youtube.com/@abhinaythakur" target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">YouTube</a>
+</div>

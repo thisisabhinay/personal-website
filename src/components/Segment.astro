@@ -1,0 +1,16 @@
+---
+interface Props {
+  time: string;
+}
+
+const { time } = Astro.props;
+---
+
+<div class="flex gap-4 group">
+  <span class="shrink-0 text-xs font-mono text-zinc-400 pt-0.5 tabular-nums w-14 text-right">
+    [{time}]
+  </span>
+  <div class="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+    <slot />
+  </div>
+</div>

@@ -1,0 +1,64 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TagList from '../components/TagList.astro';
+import CategoryBadge from '../components/CategoryBadge.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import { getYouTubeEmbedUrl } from '../lib/youtube';
+
+const { frontmatter, headings = [] } = Astro.props;
+const isVideo = frontmatter.contentType === 'video';
+const embedUrl = isVideo && frontmatter.videoUrl ? getYouTubeEmbedUrl(frontmatter.videoUrl) : null;
+---
+
+<BaseLayout title={frontmatter.title} description={frontmatter.description} type="article" publishedDate={frontmatter.pubDate}>
+  <article>
+    <header class="mb-10 border-b border-zinc-200 dark:border-zinc-800 pb-8">
+      <h1 class="text-3xl font-semibold mb-4 tracking-tight text-zinc-900 dark:text-zinc-100">{frontmatter.title}</h1>
+      <div class="flex gap-3 text-sm text-zinc-500 mb-3">
+        <time datetime={new Date(frontmatter.pubDate).toISOString().split('T')[0]}>{new Date(frontmatter.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
+        <span>&middot;</span>
+        <CategoryBadge category={frontmatter.category} />
+        {isVideo && frontmatter.duration && (
+          <>
+            <span>&middot;</span>
+            <span>{frontmatter.duration}</span>
+          </>
+        )}
+      </div>
+      {frontmatter.tags && frontmatter.tags.length > 0 && (
+        <TagList tags={frontmatter.tags} />
+      )}
+      {isVideo && embedUrl && (
+        <div class="mt-6 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 aspect-video">
+          <iframe
+            src={embedUrl}
+            title={frontmatter.title}
+            class="w-full h-full"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          />
+        </div>
+      )}
+      {isVideo && !embedUrl && frontmatter.videoUrl && (
+        <div class="mt-6">
+          <a
+            href={frontmatter.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Watch Video
+          </a>
+        </div>
+      )}
+    </header>
+    <TableOfContents headings={headings} />
+    <div class="prose prose-zinc dark:prose-invert prose-a:text-blue-600 dark:prose-a:text-blue-400 hover:prose-a:text-blue-500 dark:hover:prose-a:text-blue-300 max-w-none dark:prose-headings:text-zinc-100 dark:prose-p:text-zinc-300 dark:prose-li:text-zinc-300 dark:prose-strong:text-zinc-200 dark:prose-code:text-zinc-200 dark:prose-pre:bg-zinc-800">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

@@ -1,18 +1,57 @@
 ---
-import PageHeading from "../../components/page-heading.astro"
-import ListPosts from "../../components/list-posts.astro"
-import Layout from "../../layouts/main.astro"
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const latestYear = String(sortedPosts[0].data.pubDate.getFullYear());
+const allYears = [...new Set(sortedPosts.map((p) => String(p.data.pubDate.getFullYear())))];
+allYears.sort((a, b) => Number(b) - Number(a));
+
+// Show latest year's posts on /blog
+const latestYearPosts = sortedPosts.filter((p) => String(p.data.pubDate.getFullYear()) === latestYear);
 ---
 
-<Layout title="My Writings">
-  <section class="relative z-20 max-w-2xl mx-auto my-12 px-7 lg:px-0">
-    <PageHeading
-      title="My Writings"
-      description="Dive into my musings on life and tech in my latest posts; a blend of introspection and innovation. Keep an eye out for fresh insights and updates!"
-    />
+<BaseLayout title="Blog" description="All posts about game systems engineering, frontend systems, and AI.">
+  <h1 class="text-3xl font-semibold tracking-tight mb-4">Blog</h1>
 
-    <div class="mt-7">
-      <ListPosts />
+  <nav class="flex items-center gap-3 mb-12 text-sm">
+    {allYears.map((y) => (
+      <a
+        href={y === latestYear ? '/blog' : `/blog/${y}`}
+        class:list={[
+          'px-2 py-1 rounded transition-colors',
+          y === latestYear
+            ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-medium'
+            : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
+        ]}
+      >
+        {y}
+      </a>
+    ))}
+  </nav>
+
+  <ul class="space-y-8">
+    {latestYearPosts.map((post) => (
+      <PostCard
+        slug={post.slug}
+        title={post.data.title}
+        description={post.data.description}
+        pubDate={post.data.pubDate}
+        category={post.data.category}
+        tags={post.data.tags}
+        thumbnail={post.data.thumbnail}
+        contentType={post.data.contentType}
+      />
+    ))}
+  </ul>
+
+  {allYears.length > 1 && (
+    <div class="flex justify-end mt-14 text-sm">
+      <a href={`/blog/${allYears[1]}`} class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+        {allYears[1]} &rarr;
+      </a>
     </div>
-  </section>
-</Layout>
+  )}
+</BaseLayout>

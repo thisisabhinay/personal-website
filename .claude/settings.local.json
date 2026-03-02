@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs ls -la)",
+      "Bash(npm run build)",
+      "Bash(npm ls @astrojs/sitemap)",
+      "Bash(npm install @astrojs/sitemap@latest)",
+      "Bash(npm install @astrojs/sitemap@3.1.1)",
+      "Bash(npm ls astro sitemap @astrojs/sitemap)",
+      "Bash(npm install @astrojs/sitemap@3.2.1)",
+      "Bash(npx astro build)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(lsof -i :4321 -i :4322 -t)",
+      "Bash(xargs -r kill)",
+      "Bash(cat /Users/abhinay/blog/abhinay-website/src/pages/blog/[...slug].astro)",
+      "Bash(cat /Users/abhinay/blog/abhinay-website/src/pages/category/[category].astro)",
+      "Bash(du -sh /Users/abhinay/blog/abhinay-website/src/*)",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); print\\(data[0][''text'']\\)\")",
+      "Bash(npm install -D vitest @playwright/test msw cheerio @vitest/coverage-v8)",
+      "Bash(pnpm add -D vitest @playwright/test msw cheerio @vitest/coverage-v8)",
+      "Bash(npx playwright install chromium)",
+      "Bash(pnpm test:unit)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm ls @astrojs/sitemap)",
+      "Bash(pnpm add @astrojs/sitemap@3.2.1)",
+      "Bash(pnpm test:integration)",
+      "Bash(pnpm test:e2e)",
+      "Bash(kill %1)",
+      "Bash(lsof -ti:4321)",
+      "Bash(xargs kill -9)",
+      "Bash(lsof -ti:4322)",
+      "Bash(pnpm test)",
+      "Bash(pnpm test:coverage)",
+      "Bash(pnpm add -D @vitest/coverage-v8@2.1.8)",
+      "Bash(pnpm remove @vitest/coverage-v8)",
+      "Bash(pnpm add -D @vitest/coverage-istanbul)"
+    ]
+  }
+}

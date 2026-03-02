@@ -1,0 +1,17 @@
+---
+import { getCategorySlug } from '../lib/categories';
+
+interface Props {
+  category: string;
+}
+
+const { category } = Astro.props;
+const slug = getCategorySlug(category);
+---
+
+<a
+  href={`/category/${slug}`}
+  class="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+>
+  {category}
+</a>

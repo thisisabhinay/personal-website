@@ -1,19 +1,59 @@
 ---
-import HeroSection from "../components/hero-section.astro"
-import PortfolioGrid from "../components/portfolio-grid.astro"
-import SideProjectsGrid from "../components/side-projects-grid.astro"
-import Testimonials from "../components/testimonials.astro"
-import Writings from "../components/writings.astro"
-import Layout from "../layouts/main.astro"
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { getCollection } from 'astro:content';
 
+const posts = await getCollection('blog');
+const recentPosts = posts
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 10);
 ---
 
-<Layout title="Abhinay">
-<div class="grid grid-cols-1 auto-rows-max gap-28">
-    <HeroSection />
-    <PortfolioGrid count={6} />
-    <Testimonials />
-    <SideProjectsGrid count={3} />
-    <Writings />
-  </div>
-</Layout>
+<BaseLayout title="Software Engineer" description="Writing about game systems engineering and real-time multiplayer architecture.">
+  <section class="mb-16">
+    <div class="w-16 h-16 rounded-2xl bg-zinc-200 dark:bg-zinc-700 overflow-hidden mb-5">
+      <img src="/avatar.jpg" alt="Abhinay Thakur" class="w-full h-full object-cover" onerror="this.style.display='none'" />
+    </div>
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Abhinay Thakur</h1>
+    <p class="text-sm text-zinc-500 mt-1 mb-6">Software Engineer</p>
+    <div class="space-y-4 text-zinc-700 dark:text-zinc-400 leading-relaxed">
+      <p>
+        8 years of frontend systems — microfrontends, workflow engines, real-time multiplayer. Currently building multiplayer game server infrastructure in Go and integrating AI into real-time game systems.
+      </p>
+      <p>
+        I write about game systems engineering, real-time multiplayer architecture, and the engineering decisions that don't have obvious answers.
+      </p>
+    </div>
+    <SocialLinks class="mt-6" />
+  </section>
+
+  <section>
+    <h2 class="text-sm font-medium text-zinc-400 uppercase tracking-wider mb-8">Recent Posts</h2>
+    <ul class="space-y-10">
+      {recentPosts.map((post) => (
+        <PostCard
+          slug={post.slug}
+          title={post.data.title}
+          description={post.data.description}
+          pubDate={post.data.pubDate}
+          category={post.data.category}
+          tags={post.data.tags}
+          thumbnail={post.data.thumbnail}
+          contentType={post.data.contentType}
+        />
+      ))}
+    </ul>
+    <div class="mt-12 text-center">
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+      >
+        All Posts
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

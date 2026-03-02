@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  const years = [...new Set(posts.map((p) => String(p.data.pubDate.getFullYear())))];
+  years.sort((a, b) => Number(b) - Number(a));
+
+  return years.map((year) => {
+    const yearPosts = posts
+      .filter((p) => String(p.data.pubDate.getFullYear()) === year)
+      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    return {
+      params: { year },
+      props: { year, posts: yearPosts, allYears: years },
+    };
+  });
+}
+
+type BlogPost = Awaited<ReturnType<typeof getCollection>>[number];
+
+interface Props {
+  year: string;
+  posts: BlogPost[];
+  allYears: string[];
+}
+
+const { year, posts, allYears } = Astro.props;
+const currentIndex = allYears.indexOf(year);
+const newerYear = currentIndex > 0 ? allYears[currentIndex - 1] : null;
+const olderYear = currentIndex < allYears.length - 1 ? allYears[currentIndex + 1] : null;
+---
+
+<BaseLayout title={`Blog — ${year}`} description={`Posts from ${year} about game systems engineering, frontend systems, and AI.`}>
+  <h1 class="text-3xl font-semibold tracking-tight mb-4">Blog</h1>
+
+  <nav class="flex items-center gap-3 mb-12 text-sm">
+    {allYears.map((y) => (
+      <a
+        href={`/blog/${y}`}
+        class:list={[
+          'px-2 py-1 rounded transition-colors',
+          y === year
+            ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-medium'
+            : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
+        ]}
+      >
+        {y}
+      </a>
+    ))}
+  </nav>
+
+  <ul class="space-y-8">
+    {posts.map((post) => (
+      <PostCard
+        slug={post.slug}
+        title={post.data.title}
+        description={post.data.description}
+        pubDate={post.data.pubDate}
+        category={post.data.category}
+        tags={post.data.tags}
+        thumbnail={post.data.thumbnail}
+        contentType={post.data.contentType}
+      />
+    ))}
+  </ul>
+
+  <div class="flex justify-between mt-14 text-sm">
+    {newerYear ? (
+      <a href={`/blog/${newerYear}`} class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+        &larr; {newerYear}
+      </a>
+    ) : <span />}
+    {olderYear ? (
+      <a href={`/blog/${olderYear}`} class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+        {olderYear} &rarr;
+      </a>
+    ) : <span />}
+  </div>
+</BaseLayout>

@@ -1,0 +1,99 @@
+---
+title: "Entity Component System: Why Modern Game Engines Ditched OOP"
+description: "A deep look at ECS architecture — how decoupling data from behavior unlocks cache-friendly iteration and scalable game worlds."
+pubDate: 2025-08-12
+category: "Game Systems Engineering"
+tags: ["ecs", "game-engine", "architecture", "go"]
+---
+
+The Entity Component System pattern has quietly become the dominant architecture in modern game engines. Unity rewrote their core around it. Bevy was built on it from day one. But most explanations stop at "it's better than OOP" without showing *why*.
+
+## The Problem with Inheritance
+
+Consider a classic game object hierarchy:
+
+```
+GameObject
+├── Character
+│   ├── Player
+│   └── Enemy
+├── Projectile
+└── Pickup
+```
+
+This works until you need a `PlayerProjectile` that inherits behavior from both `Player` and `Projectile`. Or an `EnemyPickup`. Inheritance hierarchies are rigid — they force you to predict every combination upfront.
+
+## Components as Data Bags
+
+In ECS, entities are just IDs. Components are plain data structs. Systems operate on sets of components.
+
+```go
+// Components are pure data
+type Position struct {
+    X, Y float64
+}
+
+type Velocity struct {
+    DX, DY float64
+}
+
+type Health struct {
+    Current int
+    Max     int
+}
+
+type Sprite struct {
+    TextureID string
+    Width     int
+    Height    int
+}
+```
+
+An entity that moves and renders is just an ID that has `Position`, `Velocity`, and `Sprite` components attached. No class hierarchy. No virtual dispatch.
+
+## Systems Do the Work
+
+Systems query for entities that have specific component combinations and process them in tight loops:
+
+```go
+func MovementSystem(world *World, dt float64) {
+    // Query all entities with both Position and Velocity
+    for _, entity := range world.Query(Position{}, Velocity{}) {
+        pos := world.Get[Position](entity)
+        vel := world.Get[Velocity](entity)
+
+        pos.X += vel.DX * dt
+        pos.Y += vel.DY * dt
+    }
+}
+
+func RenderSystem(world *World) {
+    for _, entity := range world.Query(Position{}, Sprite{}) {
+        pos := world.Get[Position](entity)
+        spr := world.Get[Sprite](entity)
+
+        draw(spr.TextureID, pos.X, pos.Y, spr.Width, spr.Height)
+    }
+}
+```
+
+## Cache Performance
+
+The real win is memory layout. When components of the same type are stored contiguously in memory (an archetype or SoA layout), iterating over them is extremely cache-friendly:
+
+```go
+// Archetype stores components in contiguous arrays
+type Archetype struct {
+    entities   []EntityID
+    positions  []Position   // contiguous in memory
+    velocities []Velocity   // contiguous in memory
+}
+```
+
+Instead of chasing pointers across the heap (as you would with polymorphic objects), you're iterating flat arrays. On modern hardware with 64-byte cache lines, this difference is measured in orders of magnitude for large entity counts.
+
+## Composition Over Inheritance
+
+Need an entity that moves, has health, and renders? Attach `Position`, `Velocity`, `Health`, and `Sprite`. Need a static obstacle? Just `Position` and `Sprite`. No new class needed — just a different combination of the same building blocks.
+
+This is the fundamental insight: game objects aren't defined by *what they are* (class identity), but by *what they have* (component composition).

@@ -1,20 +1,22 @@
-import { defineCollection } from "astro:content";
-import { blogSchema, portfolioSchema, sideProjectSchema } from "../schema";
+import { defineCollection, z } from 'astro:content';
 
-const BlogPosts = defineCollection({
-  schema: blogSchema,
+const blog = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.date(),
+    category: z.enum([
+      'Game Systems Engineering',
+      'Frontend Systems at Depth',
+      'AI × Games',
+    ]),
+    tags: z.array(z.string()).optional(),
+    thumbnail: z.string().optional(),
+    contentType: z.enum(['article', 'video']).default('article'),
+    videoUrl: z.string().optional(),
+    duration: z.string().optional(),
+  }),
 });
 
-const Portfolio = defineCollection({
-  schema: portfolioSchema,
-});
-
-const SideProjects = defineCollection({
-  schema: sideProjectSchema,
-});
-
-export const collections = {
-  blog: BlogPosts,
-  portfolio: Portfolio,
-  sideProjects: SideProjects,
-};
+export const collections = { blog };

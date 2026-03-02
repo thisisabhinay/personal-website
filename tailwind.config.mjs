@@ -1,13 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: "class",
-  content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
+  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  darkMode: 'class',
   theme: {
     extend: {
-      zIndex: {
-        100: "100",
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
-};
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
+}

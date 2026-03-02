@@ -1,77 +1,45 @@
 ---
-import experiences from "../data/experiences.json"
-import AboutExperience from "../components/about-experience.astro"
-import PageHeading from "../components/page-heading.astro"
-import Layout from "../layouts/main.astro"
-import Button from "../components/button.astro"
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<Layout title="About Me">
-  <section class="relative z-20 max-w-2xl mx-auto my-12 px-7 lg:px-0">
-    <PageHeading
-      title="About Me"
-      description="Hello 👋 I'm Abhinay, a senior frontend engineer from India with expertise in Vue.js, React.js, and JavaScript. I thrive on tackling challenges and delivering high-performance, scalable web applications. With a passion for lean product development and a drive to continuously learn and grow, I'm always excited to work on innovative projects that make a real impact."
-    />
+<BaseLayout title="About" description="Career arc, projects, and background.">
+  <div class="prose prose-zinc dark:prose-invert max-w-none dark:prose-headings:text-zinc-100 dark:prose-p:text-zinc-300 dark:prose-li:text-zinc-300 dark:prose-strong:text-zinc-200">
+    <h1 class="text-3xl font-semibold tracking-tight">About</h1>
 
-    <img
-      src="/assets/images/about.avif"
-      class="relative z-30 w-full my-10 rounded-xl"
-    />
+    <h2>The Career Arc</h2>
+    <p>Starting in design, moving deeply into frontend systems, and now transitioning to game systems engineering.</p>
 
-    <!-- <h2 class="mb-2 text-2xl font-bold dark:text-neutral-200">Short Bio</h2>
-    <p
-      class="text-sm leading-6 text-gray-600 dark:text-neutral-400 sm:leading-7 lg:leading-8 sm:text-base lg:text-lg"
+    <h2>Projects</h2>
+
+    <h3>Game Systems Engineering</h3>
+    <ul>
+      <li><strong>Project Alpha:</strong> Real-time server architecture in Go.</li>
+    </ul>
+
+    <h3>Frontend Systems</h3>
+    <ul>
+      <li><strong>Project Beta:</strong> Microfrontend architecture scale-up.</li>
+    </ul>
+
+    <h3>AI &times; Games</h3>
+    <ul>
+      <li><strong>Project Gamma:</strong> Integrating LLMs into NPC dialogue trees.</li>
+    </ul>
+
+    <h2>What People Say</h2>
+    <blockquote>
+      <p>Testimonial placeholder — replace with real quotes from colleagues.</p>
+      <footer class="text-sm text-zinc-500 not-italic">— Name, Role at Company</footer>
+    </blockquote>
+  </div>
+
+  <div class="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+    <a
+      href="/resume.pdf"
+      target="_blank"
+      class="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
     >
-      I'm a passionate Senior Frontend Engineer specializing in Vue.js,
-      React.js, and JavaScript, with a proven track record of delivering
-      innovative solutions that drive business growth and enhance user
-      experiences for companies like HighLevel and Attryb.
-    </p> -->
-
-    <h2
-      class="mt-5 mb-2 text-2xl font-bold lg:mt-10 sm:mt-6 dark:text-neutral-200"
-    >
-      Experience
-    </h2>
-    <div class="px-5 pt-10">
-      {
-        experiences.map((experience, loop) => {
-          return (
-            <div class="pb-10 border-l last:border-none border-gray-200 dark:border-neutral-700">
-              <AboutExperience
-                dates={experience.dates}
-                role={experience.role}
-                company={experience.company}
-                description={experience.description}
-                logo={experience.logo}
-                hideLogo={experiences[loop - 1]?.company === experience.company}
-              />
-            </div>
-          )
-        })
-      }
-    </div>
-
-    <h2
-      class="mt-5 mb-2 text-2xl font-bold lg:mt-10 sm:mt-6 dark:text-neutral-200"
-    >
-      Let's Connect
-    </h2>
-    <p
-      class="text-sm leading-6 text-gray-600 dark:text-neutral-400 sm:leading-7 lg:leading-8 sm:text-base lg:text-lg"
-    >
-      If you want to stay up to date with my work be sure to
-      <a
-        href="https://twitter.com/thisisabhinay"
-        target="_blank"
-        class="text-indigo-600 underline"
-      >follow me on twitter</a>, or want to discuss a project? You can schedule a 1-on-1 meeting with me.
-
-      <Button
-        text="Schedule a meeting"
-        link="https://calendar.app.google/T8V2fr9b9mxMGyzAA"
-        target="_blank"
-      />
-    </p>
-  </section>
-</Layout>
+      View Resume &rarr;
+    </a>
+  </div>
+</BaseLayout>

@@ -1,0 +1,157 @@
+---
+title: "Building a Real-Time Multiplayer Game Server in Go: Architecture Decisions"
+description: "Architecture decisions, trade-offs, and lessons from building an authoritative game server — goroutines, tick loops, and state synchronization."
+pubDate: 2026-02-15
+category: "Game Systems Engineering"
+tags: ["go", "game-server", "multiplayer", "architecture"]
+---
+
+When I started building an authoritative game server in Go, I hit a problem with state synchronization that none of the game networking tutorials prepared me for. The tutorials show you the happy path — one player moves, the server validates, the client interpolates. They don't show you what happens when three players send conflicting inputs within the same tick, and your goroutines are racing to update shared state.
+
+This is the architecture I arrived at, the decisions that shaped it, and what I'd do differently.
+
+## The Core Loop
+
+Every game server needs a tick loop — a fixed-timestep simulation that processes inputs, updates game state, and broadcasts results. Here's the skeleton:
+
+```go
+func (s *Server) Run(ctx context.Context) {
+    ticker := time.NewTicker(time.Second / time.Duration(s.tickRate))
+    defer ticker.Stop()
+
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        case <-ticker.C:
+            s.tick()
+        }
+    }
+}
+
+func (s *Server) tick() {
+    s.mu.Lock()
+    defer s.mu.Unlock()
+
+    // 1. Process all queued inputs
+    inputs := s.inputQueue.DrainAll()
+    for _, input := range inputs {
+        s.applyInput(input)
+    }
+
+    // 2. Run physics / game logic
+    s.simulate(s.dt)
+
+    // 3. Build and broadcast state snapshot
+    snapshot := s.buildSnapshot()
+    s.broadcast(snapshot)
+}
+```
+
+The `select` statement is the key pattern. Go's channel-based concurrency means the tick loop can cleanly handle shutdown signals alongside the timer. No polling, no flag checks.
+
+## Input Handling: The Queue Pattern
+
+The biggest architectural decision was how to get player inputs from network goroutines into the tick loop.
+
+### Why Not Channels Directly?
+
+My first instinct was to use a Go channel. But a buffered channel has a fixed size — if a client floods inputs faster than the tick rate processes them, you either block the network goroutine or drop inputs silently. Neither is acceptable.
+
+### The Lock-Free Ring Buffer
+
+Instead, I used a lock-free ring buffer as the input queue. Each player connection runs in its own goroutine, reading from a WebSocket:
+
+```go
+func (s *Server) handleConnection(conn *websocket.Conn, playerID string) {
+    for {
+        var input PlayerInput
+        if err := conn.ReadJSON(&input); err != nil {
+            s.removePlayer(playerID)
+            return
+        }
+        input.PlayerID = playerID
+        input.ReceivedAt = time.Now()
+
+        s.inputQueue.Push(input)
+    }
+}
+```
+
+The `inputQueue` is a lock-free ring buffer. This is where the architecture diverges from the naive approach of locking game state on every input. With hundreds of players sending inputs 20-60 times per second, a mutex on the game state would create unacceptable contention.
+
+```go
+type InputQueue struct {
+    buf  [4096]PlayerInput
+    head atomic.Uint64
+    tail atomic.Uint64
+}
+
+func (q *InputQueue) Push(input PlayerInput) bool {
+    tail := q.tail.Load()
+    next := (tail + 1) % uint64(len(q.buf))
+    if next == q.head.Load() {
+        return false // queue full, drop input
+    }
+    q.buf[tail] = input
+    q.tail.Store(next)
+    return true
+}
+
+func (q *InputQueue) DrainAll() []PlayerInput {
+    head := q.head.Load()
+    tail := q.tail.Load()
+    if head == tail {
+        return nil
+    }
+
+    var inputs []PlayerInput
+    for head != tail {
+        inputs = append(inputs, q.buf[head])
+        head = (head + 1) % uint64(len(q.buf))
+    }
+    q.head.Store(head)
+    return inputs
+}
+```
+
+The lock-free ring buffer means input goroutines never block on game state, and the tick loop drains everything at once. The trade-off: if the queue fills up (server overloaded), inputs get dropped. In practice, a 4096-slot buffer at 60 tick rate handles ~200 concurrent players comfortably.
+
+## State Snapshots and Delta Compression
+
+Broadcasting full state every tick is wasteful. Most entities don't change between ticks. Delta compression sends only what changed:
+
+```go
+type Snapshot struct {
+    Tick     uint64            `json:"tick"`
+    Full     bool              `json:"full,omitempty"`
+    Entities map[string]Entity `json:"entities,omitempty"`
+    Removed  []string          `json:"removed,omitempty"`
+}
+
+func (s *Server) buildDeltaSnapshot() Snapshot {
+    snap := Snapshot{Tick: s.currentTick}
+    for id, entity := range s.entities {
+        prev, existed := s.previousState[id]
+        if !existed || entity.Changed(prev) {
+            snap.Entities[id] = entity
+        }
+    }
+    for id := range s.previousState {
+        if _, exists := s.entities[id]; !exists {
+            snap.Removed = append(snap.Removed, id)
+        }
+    }
+    return snap
+}
+```
+
+New clients get a full snapshot on join. After that, deltas only. This cut bandwidth by roughly 80% in my tests with 50 entities.
+
+## What I'd Do Differently
+
+**Start with the input queue design, not bolt it on.** My first version used a simple mutex around game state. It worked fine with 5 players. At 50, the tick loop started missing its deadline because goroutines were contending on the lock. The refactor to a lock-free queue touched almost every file.
+
+**Use a proper ECS from the start.** I started with plain structs and maps. By the time I had physics, health, inventory, and position components, the `Entity` struct was 400 lines and every system touched fields it didn't need. An entity-component-system architecture would have kept things composable.
+
+**Measure tick budget early.** I didn't instrument tick duration until month two. Turns out my physics simulation was eating 60% of the tick budget, leaving almost nothing for AI pathfinding. Profiling from day one would have caught this before it became an architecture problem.

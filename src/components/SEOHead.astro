@@ -1,0 +1,67 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  type?: 'website' | 'article';
+  publishedDate?: Date;
+  image?: string;
+}
+
+const { title, description, type = 'website', publishedDate, image } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+const siteName = 'Abhinay Thakur';
+const ogImage = image ? new URL(image, Astro.site).href : undefined;
+
+const jsonLd = type === 'article'
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: title,
+      description,
+      url: canonicalUrl,
+      author: {
+        '@type': 'Person',
+        name: siteName,
+        url: Astro.site?.href,
+      },
+      publisher: {
+        '@type': 'Person',
+        name: siteName,
+      },
+      ...(publishedDate && { datePublished: publishedDate.toISOString() }),
+      ...(ogImage && { image: ogImage }),
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: siteName,
+      url: Astro.site?.href,
+      description,
+      author: {
+        '@type': 'Person',
+        name: siteName,
+      },
+    };
+---
+
+<meta name="description" content={description} />
+<meta name="author" content={siteName} />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href={canonicalUrl} />
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="en_US" />
+{publishedDate && <meta property="article:published_time" content={publishedDate.toISOString()} />}
+{publishedDate && <meta property="article:author" content={siteName} />}
+{ogImage && <meta property="og:image" content={ogImage} />}
+
+<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{ogImage && <meta name="twitter:image" content={ogImage} />}
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

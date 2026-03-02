@@ -1,0 +1,25 @@
+---
+title: "How We Managed State Across 6 Micro Frontends"
+description: "Architecture decisions, trade-offs, and lessons from managing shared state across independently deployed micro frontends at scale."
+pubDate: 2026-03-01
+category: "Frontend Systems at Depth"
+tags: ["micro-frontends", "state-management", "architecture"]
+---
+
+This is a sample post to verify the writing collection and routing work correctly. Replace this with real content.
+
+## The Problem
+
+When you have six independently deployed micro frontends sharing a single browser window, state management stops being a library choice and becomes an architecture decision.
+
+## What We Tried
+
+We evaluated several approaches — from a shared Redux store to event-based communication to a custom state bus built on top of Module Federation's shared scope.
+
+## The Pattern That Emerged
+
+The key insight was treating shared state as infrastructure, not application code. Each micro frontend owns its domain state completely. Cross-cutting state lives in a thin coordination layer that every app can subscribe to but none can directly mutate.
+
+## What I'd Do Differently
+
+Start with the coordination layer from day one instead of retrofitting it after three teams have already built their own state management patterns.
