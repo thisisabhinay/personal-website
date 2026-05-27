@@ -1,0 +1,79 @@
+---
+import testimonials from "../data/testimonials.json";
+
+// Duplicate for seamless loop
+const items = [...testimonials, ...testimonials];
+const cardWidth = 280;
+const gap = 16;
+const totalWidth = testimonials.length * (cardWidth + gap);
+const duration = `${testimonials.length * 6}s`;
+const translateDistance = `-${totalWidth}px`;
+---
+
+<div class="carousel-container relative overflow-hidden w-full">
+  <div class="carousel-track flex gap-4">
+    {
+      items.map((t) => (
+        <div class="carousel-card flex-shrink-0 rounded-xl border border-neutral-200 dark:border-neutral-800 p-4" style={`width: ${cardWidth}px;`}>
+          <div class="size-5 text-neutral-300 dark:text-neutral-600 mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M12 12a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1h-1.388q0-.527.062-1.054.093-.558.31-.992t.559-.683q.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 9 7.558V11a1 1 0 0 0 1 1zm-6 0a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1H4.612q0-.527.062-1.054.094-.558.31-.992.217-.434.559-.683.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 3 7.558V11a1 1 0 0 0 1 1z" />
+            </svg>
+          </div>
+          <p class="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-6 mb-3 leading-relaxed">
+            {t.text}
+          </p>
+          <div class="flex items-center gap-2">
+            <img
+              src={t.profile}
+              alt={`Photo of ${t.name}`}
+              width="32"
+              height="32"
+              class="rounded-full object-cover w-8 h-8"
+            />
+            <div class="text-[11px] flex flex-col text-neutral-900 font-medium dark:text-neutral-200">
+              <span>{t.name}</span>
+              <span class="font-normal text-neutral-500 dark:text-neutral-400">{t.designation}</span>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style define:vars={{ duration, translateDistance }}>
+  .carousel-container {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent
+    );
+  }
+
+  .carousel-track {
+    animation: scroll var(--duration) linear infinite;
+  }
+
+  .carousel-track:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(var(--translateDistance));
+    }
+  }
+</style>
