@@ -1,0 +1,52 @@
+---
+import Button from "../../components/button.astro";
+import ListPosts from "../../components/list-posts.astro";
+import PageHeading from "../../components/page-heading.astro";
+import Layout from "../../layouts/main.astro";
+import {
+	formatCollectionName,
+	getCollectionDescription,
+} from "../../utils/collections";
+import { latestPosts } from "../../utils/posts";
+
+export function getStaticPaths() {
+	const collectionSet = new Set<string>();
+	latestPosts.forEach((post) => {
+		post.data.collections?.forEach((col: string) => collectionSet.add(col));
+	});
+
+	return Array.from(collectionSet).map((name) => {
+		const filtered = latestPosts.filter((post) =>
+			post.data.collections?.includes(name),
+		);
+		return {
+			params: { name },
+			props: { name, posts: filtered },
+		};
+	});
+}
+
+const { name, posts } = Astro.props;
+const displayName = formatCollectionName(name);
+const collectionDesc = getCollectionDescription(name);
+const description = `${posts.length} post${posts.length === 1 ? "" : "s"}${
+	collectionDesc ? ` · ${collectionDesc}` : ""
+}`;
+---
+
+<Layout title={displayName} description={`Posts in the "${displayName}" collection.`}>
+  <section class="relative z-20 max-w-2xl mx-auto my-12 px-7 lg:px-0">
+    <PageHeading
+      title={displayName}
+      description={description}
+    />
+
+    <div class="mt-7">
+      <ListPosts posts={posts} />
+    </div>
+
+    <div class="flex items-center justify-center w-full mt-10">
+      <Button text="View All Collections" link="/collection" />
+    </div>
+  </section>
+</Layout>

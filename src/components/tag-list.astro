@@ -1,0 +1,36 @@
+---
+import { formatCollectionName } from "../utils/collections";
+
+interface Props {
+	tags: string[];
+	collections?: string[];
+	class?: string;
+}
+
+const { tags, collections = [], class: className = "" } = Astro.props;
+const hasContent = (collections && collections.length > 0) || (tags && tags.length > 0);
+---
+
+{hasContent && (
+  <div class={`flex flex-wrap items-center gap-1.5 ${className}`}>
+    {collections.map((col) => (
+      <a
+        href={`/collection/${col}`}
+        class="text-xs px-2.5 py-1 rounded-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors font-medium"
+      >
+        {formatCollectionName(col)}
+      </a>
+    ))}
+    {collections.length > 0 && tags.length > 0 && (
+      <span class="w-px h-4 bg-neutral-200 dark:bg-neutral-700 mx-1" />
+    )}
+    {tags.map((tag) => (
+      <a
+        href={`/tag/${tag}`}
+        class="text-xs px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors"
+      >
+        {tag}
+      </a>
+    ))}
+  </div>
+)}

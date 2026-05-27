@@ -1,0 +1,43 @@
+---
+import Button from "../../components/button.astro";
+import ListPosts from "../../components/list-posts.astro";
+import PageHeading from "../../components/page-heading.astro";
+import Layout from "../../layouts/main.astro";
+import { latestPosts } from "../../utils/posts";
+
+export function getStaticPaths() {
+	const tagSet = new Set<string>();
+	latestPosts.forEach((post) => {
+		post.data.tags?.forEach((tag: string) => tagSet.add(tag));
+	});
+
+	return Array.from(tagSet).map((tag) => {
+		const filtered = latestPosts.filter((post) =>
+			post.data.tags?.includes(tag),
+		);
+		return {
+			params: { tag },
+			props: { tag, posts: filtered },
+		};
+	});
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Layout title={`#${tag}`} description={`Articles tagged "${tag}".`}>
+  <section class="relative z-20 max-w-2xl mx-auto my-12 px-7 lg:px-0">
+    <PageHeading
+      title={`#${tag}`}
+      description={`${posts.length} post${posts.length === 1 ? "" : "s"} tagged "${tag}".`}
+    />
+
+    <div class="mt-7">
+      <ListPosts posts={posts} />
+    </div>
+
+    <div class="flex items-center justify-center w-full mt-10">
+      <Button text="View All Tags" link="/tag" />
+    </div>
+  </section>
+</Layout>

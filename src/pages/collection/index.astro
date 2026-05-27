@@ -1,0 +1,53 @@
+---
+import PageHeading from "../../components/page-heading.astro";
+import Layout from "../../layouts/main.astro";
+import { formatCollectionName, getCollectionDescription } from "../../utils/collections";
+import { latestPosts } from "../../utils/posts";
+
+const collectionCounts = new Map<string, number>();
+
+latestPosts.forEach((post) => {
+	post.data.collections?.forEach((col: string) => {
+		collectionCounts.set(col, (collectionCounts.get(col) || 0) + 1);
+	});
+});
+
+const sortedCollections = [...collectionCounts.entries()].sort(
+	(a, b) => b[1] - a[1],
+);
+---
+
+<Layout title="Collections" description="Browse all collections.">
+  <section class="relative z-20 max-w-4xl mx-auto my-12 px-7 lg:px-0">
+    <PageHeading
+      title="Collections"
+      description="Curated groups of related posts."
+    />
+
+    {sortedCollections.length > 0 && (
+      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {sortedCollections.map(([name, count]) => {
+          const desc = getCollectionDescription(name);
+          return (
+            <a
+              href={`/collection/${name}`}
+              class="block group p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors"
+            >
+              <h2 class="text-base font-semibold text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 transition-colors">
+                {formatCollectionName(name)}
+              </h2>
+              <span class="text-xs text-neutral-400 dark:text-neutral-500">
+                {count} post{count === 1 ? "" : "s"}
+              </span>
+              {desc && (
+                <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2">
+                  {desc}
+                </p>
+              )}
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </section>
+</Layout>

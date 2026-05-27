@@ -1,0 +1,55 @@
+---
+import PageHeading from "../../components/page-heading.astro";
+import Layout from "../../layouts/main.astro";
+import { latestPosts } from "../../utils/posts";
+
+const tagCounts = new Map<string, number>();
+
+latestPosts.forEach((post) => {
+	post.data.tags?.forEach((tag: string) => {
+		tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+	});
+});
+
+const sortedTags = [...tagCounts.entries()].sort((a, b) =>
+	a[0].localeCompare(b[0], undefined, { sensitivity: "base" }),
+);
+
+const grouped = new Map<string, [string, number][]>();
+for (const entry of sortedTags) {
+	const letter = entry[0][0].toUpperCase();
+	if (!grouped.has(letter)) grouped.set(letter, []);
+	grouped.get(letter)!.push(entry);
+}
+const sections = [...grouped.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+---
+
+<Layout title="Tags" description="Browse all tags.">
+  <section class="relative z-20 max-w-4xl mx-auto my-12 px-7 lg:px-0">
+    <PageHeading
+      title="Tags"
+      description="Browse posts by topic."
+    />
+
+    {sections.length > 0 && (
+      <div class="mt-10 space-y-8">
+        {sections.map(([letter, tags]) => (
+          <div>
+            <h2 class="text-sm font-semibold text-neutral-400 dark:text-neutral-500 mb-3">{letter}</h2>
+            <div class="flex flex-wrap gap-2">
+              {tags.map(([tag, count]) => (
+                <a
+                  href={`/tag/${tag}`}
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
+                >
+                  {tag}
+                  <span class="text-xs text-neutral-400 dark:text-neutral-500">{count}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>
