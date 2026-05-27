@@ -9,6 +9,8 @@ const {
   iconLeft,
   iconRight,
 } = Astro.props
+
+const rel = target === "_blank" ? "noopener noreferrer" : undefined
 ---
 
 <a
@@ -16,6 +18,7 @@ const {
   class="w-max mt-5 btn-rounded no-underline"
   class:list={[className]}
   target={target}
+  rel={rel}
 >
   {iconLeft ? <Icon class="text-base" name={iconLeft} /> : ""}
   {text}
