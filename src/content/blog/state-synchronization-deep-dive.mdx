@@ -1,0 +1,24 @@
+---
+title: "State Synchronization: Lockstep vs Server-Authoritative"
+description: "Discussing the trade-offs between lockstep and server-authoritative models for real-time multiplayer games."
+pubDate: 2026-03-01
+collections: ["thoughts"]
+author: "abhinay thakur"
+tags: ["multiplayer", "state-sync", "game-server"]
+contentType: "video"
+videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+duration: "45:12"
+---
+
+import Transcript from '../../components/Transcript.astro';
+import Segment from '../../components/Segment.astro';
+
+In this video, we explore the fundamental trade-offs between lockstep and server-authoritative synchronization models for multiplayer games. When should you trust the client? When must the server be the single source of truth? And what happens when latency makes both options feel wrong?
+
+<Transcript>
+  <Segment time="00:00">Welcome to the deep dive. Today we're discussing state synchronization in real-time multiplayer games — the engineering decisions that determine whether your game feels responsive or laggy.</Segment>
+  <Segment time="05:15">Let's start with lockstep synchronization. The basic idea is simple: every client simulates the same game state, and they all wait for each other's inputs before advancing. It's deterministic, which means you don't need to send much data. But it has a fundamental problem — everyone moves at the speed of the slowest connection.</Segment>
+  <Segment time="12:34">Now let's talk about the server-authoritative model. The server owns the game state. Clients send inputs, the server simulates, and sends results back. This is what most competitive multiplayer games use today. The trade-off is latency — you need client prediction and server reconciliation to make it feel responsive.</Segment>
+  <Segment time="25:10">Go's concurrency model is interesting here. Goroutines and channels map well to the game server's needs — you can handle thousands of concurrent player connections without thread management overhead. But you need to be careful about shared state. The game world is inherently shared, and goroutines don't save you from thinking about synchronization.</Segment>
+  <Segment time="38:45">To wrap up — there's no universal answer. Lockstep works for turn-based or slow-paced games with small player counts. Server-authoritative is the right default for anything real-time and competitive. The engineering challenge isn't choosing a model — it's making the chosen model feel invisible to the player.</Segment>
+</Transcript>

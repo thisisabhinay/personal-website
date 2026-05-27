@@ -1,0 +1,29 @@
+---
+interface Props {
+	time: string;
+}
+
+const { time } = Astro.props;
+
+function timeToSeconds(t: string): number {
+	const parts = t.split(":").map(Number);
+	if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+	if (parts.length === 2) return parts[0] * 60 + parts[1];
+	return 0;
+}
+
+const seconds = timeToSeconds(time);
+---
+
+<div class="flex gap-4 group">
+  <button
+    type="button"
+    data-seek-time={seconds}
+    class="shrink-0 text-xs font-mono text-neutral-400 dark:text-neutral-500 pt-0.5 tabular-nums w-14 text-right hover:text-neutral-900 dark:hover:text-neutral-100 cursor-pointer transition-colors"
+  >
+    [{time}]
+  </button>
+  <div class="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+    <slot />
+  </div>
+</div>

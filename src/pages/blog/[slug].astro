@@ -1,7 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
+import TagList from "../../components/tag-list.astro";
 import MainLayout from "../../layouts/main.astro";
+import { getYouTubeId } from "../../utils/youtube";
 
 interface Props {
 	post: CollectionEntry<"blog">;
@@ -17,8 +19,8 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-// const entry = await getEntry("blog", "post-1")
 const { Content } = await post.render();
+const isVideo = post.data.contentType === "video";
 ---
 
 <MainLayout title={post.data.title} description={post.data.description} image={post.data.image}>
@@ -38,7 +40,7 @@ const { Content } = await post.render();
       >
       </div>
       <div
-        class="flex flex-col items-start gap-7 mx-auto w-full max-w-2xl md:mb-12"
+        class="flex flex-col items-start gap-5 mx-auto w-full max-w-2xl md:mb-12"
       >
         <h1
           class="text-3xl font-bold leading-tight tracking-tighter text-left md:text-4xl dark:text-neutral-100 lg:text-5xl md:leading-none"
@@ -50,8 +52,42 @@ const { Content } = await post.render();
         >
           {post.data.description}
         </p>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs text-neutral-400 dark:text-neutral-500">
+          <time datetime={post.data.pubDate.toISOString().split("T")[0]}>
+            {post.data.pubDate.toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" })}
+          </time>
+          {isVideo && post.data.duration && (
+            <>
+              <span>&middot;</span>
+              <span class="inline-flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                Video &middot; {post.data.duration}
+              </span>
+            </>
+          )}
+        </div>
+
+        {(post.data.collections.length > 0 || post.data.tags.length > 0) && (
+          <TagList tags={post.data.tags} collections={post.data.collections} />
+        )}
       </div>
     </div>
+
+    {isVideo && post.data.videoUrl && (
+      <div id="yt-embed" class="w-full max-w-2xl mx-auto mb-4 px-7 sm:px-0">
+        <div class="w-full rounded-xl overflow-hidden aspect-video min-h-[24rem]">
+          <iframe
+            id="yt-player"
+            src={`https://www.youtube.com/embed/${getYouTubeId(post.data.videoUrl)}?enablejsapi=1`}
+            title={post.data.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            class="w-full h-full"
+          />
+        </div>
+      </div>
+    )}
 
     <article
       class="w-full max-w-2xl mx-auto mb-20 prose-sm prose px-7 sm:px-0 lg:prose-lg dark:prose-invert"
@@ -68,6 +104,11 @@ const { Content } = await post.render();
       margin-left: -8rem;
       margin-right: -8rem;
     }
+
+    #page-blog #yt-embed > div {
+      width: calc(100% + 16rem);
+      margin-left: -8rem;
+    }
   }
 
   #page-blog article p:has(img),
@@ -83,3 +124,19 @@ const { Content } = await post.render();
     border-radius: 0.75rem;
   }
 </style>
+
+<script>
+  document.querySelectorAll('[data-seek-time]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const seconds = Number(btn.getAttribute('data-seek-time'));
+      const iframe = document.getElementById('yt-player') as HTMLIFrameElement | null;
+      if (iframe) {
+        iframe.contentWindow?.postMessage(
+          JSON.stringify({ event: 'command', func: 'seekTo', args: [seconds, true] }),
+          '*'
+        );
+        iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+</script>
