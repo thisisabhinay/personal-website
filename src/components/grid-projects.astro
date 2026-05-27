@@ -10,8 +10,6 @@ interface Props {
 const { count, className = "" } = Astro.props
 
 const portfolio = count ? pinnedPortfolio.slice(0, count) : pinnedPortfolio
-
-console.log(portfolio.map((p) => p.data.title))
 ---
 
 <div
@@ -19,7 +17,7 @@ console.log(portfolio.map((p) => p.data.title))
   class:list={[className]}
 >
   {
-    portfolio.map((project: any, index: number) => {
+    portfolio.map((project: any) => {
       return (
         <Fragment>
           <Project

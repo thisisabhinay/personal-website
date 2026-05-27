@@ -8,7 +8,7 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-  const list = await getCollection("sideProjects")
+  const list = await getCollection("sideProjects", ({ data }) => data.draft !== true)
 
   return list.map((sideProject) => ({
     params: { slug: sideProject.slug },
@@ -20,7 +20,7 @@ const { sideProject } = Astro.props
 const { Content } = await sideProject.render()
 ---
 
-<MainLayout title={sideProject.data.title}>
+<MainLayout title={sideProject.data.title} description={sideProject.data.description} image={sideProject.data.image}>
   <main
     id="page-sideProject"
     class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900"
@@ -62,12 +62,12 @@ const { Content } = await sideProject.render()
 
 <style is:global>
   @media (min-width: 1024px) {
-    #page-portfolio article p:has(img) {
+    #page-sideProject article p:has(img) {
       margin-left: -8rem;
       margin-right: -8rem;
     }
 
-    #page-portfolio article p:has(img):first-child {
+    #page-sideProject article p:has(img):first-child {
       margin-bottom: 3rem;
     }
   }

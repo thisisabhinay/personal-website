@@ -22,15 +22,15 @@ const { logo, dates, role, company, description, hideLogo } = Astro.props
   <div class="flex flex-col gap-1">
     <p class="grid auto-rows-max grid-cols-[64px_1fr] gap-3 text-sm font-normal text-neutral-600 dark:text-neutral-400">
       <span class="block text-neutral-400 dark:text-neutral-500 text-right">Challenge:</span>
-      <span class="flex"><Fragment set:html={description.challenge} /></span>
+      <span class="flex">{description.challenge}</span>
     </p>
     <p class="grid auto-rows-max grid-cols-[64px_1fr] gap-3 text-sm font-normal text-neutral-600 dark:text-neutral-400">
       <span class="block text-neutral-400 dark:text-neutral-500 text-right">Action:</span>
-      <span class="flex"><Fragment set:html={description.action} /></span>
+      <span class="flex">{description.action}</span>
     </p>
     <p class="grid auto-rows-max grid-cols-[64px_1fr] gap-3 text-sm font-normal text-neutral-600 dark:text-neutral-400">
       <span class="block text-neutral-400 dark:text-neutral-500 text-right">Result:</span>
-      <span class="flex"><Fragment set:html={description.result} /></span>
+      <span class="flex">{description.result}</span>
     </p>
   </div>
 </div>
