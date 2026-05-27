@@ -1,19 +1,12 @@
 ---
-import HeroSection from "../components/hero-section.astro"
-import PortfolioGrid from "../components/portfolio-grid.astro"
-import SideProjectsGrid from "../components/side-projects-grid.astro"
-import Testimonials from "../components/testimonials.astro"
-import Writings from "../components/writings.astro"
-import Layout from "../layouts/main.astro"
-
+import HeroSection from "../components/hero-section.astro";
+import Writings from "../components/writings.astro";
+import Layout from "../layouts/main.astro";
 ---
 
 <Layout title="Abhinay" description="Senior Frontend Engineer passionate about crafting high-performance, user-friendly web applications with Vue, React, and modern web technologies.">
-<div class="grid grid-cols-1 auto-rows-max gap-28">
+  <div class="grid grid-cols-1 auto-rows-max gap-28">
     <HeroSection />
-    <PortfolioGrid count={6} />
-    <Testimonials />
-    <SideProjectsGrid count={3} />
     <Writings />
   </div>
 </Layout>

@@ -1,10 +1,10 @@
 ---
 interface Props {
-  heading: string
-  subheading?: string
+	heading: string;
+	subheading?: string;
 }
 
-const { heading, subheading } = Astro.props
+const { heading, subheading } = Astro.props;
 ---
 
 <div
@@ -13,11 +13,11 @@ const { heading, subheading } = Astro.props
 >
   <div class="flex-col gap-1">
     <h2
-      class="text-2xl font-bold leading-10 tracking-tight text-neutral-900 dark:text-neutral-100"
+      class="text-base font-semibold uppercase tracking-widest text-neutral-500 dark:text-neutral-400"
     >
       {heading}
     </h2>
-    <p class="text-base text-neutral-600 dark:text-neutral-400">
+    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
       {subheading}
     </p>
   </div>
