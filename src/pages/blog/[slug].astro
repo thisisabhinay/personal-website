@@ -1,14 +1,14 @@
 ---
 import MainLayout from "../../layouts/main.astro"
 import type { CollectionEntry } from "astro:content"
-import { getCollection, getEntry } from "astro:content"
+import { getCollection } from "astro:content"
 
 interface Props {
   post: CollectionEntry<"blog">
 }
 
 export async function getStaticPaths() {
-  const blog = await getCollection("blog")
+  const blog = await getCollection("blog", ({ data }) => data.draft !== true)
 
   return blog.map((post) => ({
     params: { slug: post.slug },
@@ -21,7 +21,7 @@ const { post } = Astro.props
 const { Content } = await post.render()
 ---
 
-<MainLayout title={post.data.title}>
+<MainLayout title={post.data.title} description={post.data.excerpt} image={post.data.image}>
   <main
     id="page-blog"
     class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900"

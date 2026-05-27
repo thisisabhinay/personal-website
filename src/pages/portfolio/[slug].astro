@@ -8,7 +8,7 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-  const list = await getCollection("portfolio")
+  const list = await getCollection("portfolio", ({ data }) => data.draft !== true)
 
   return list.map((portfolio) => ({
     params: { slug: portfolio.slug },
@@ -21,7 +21,7 @@ const { portfolio } = Astro.props
 const { Content } = await portfolio.render()
 ---
 
-<MainLayout title={portfolio.data.title}>
+<MainLayout title={portfolio.data.title} description={portfolio.data.description} image={portfolio.data.image}>
   <main
     id="page-portfolio"
     class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900"
