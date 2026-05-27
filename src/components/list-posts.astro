@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { latestPosts } from "../utils/posts";
+import { getYouTubeThumbnail } from "../utils/youtube";
 import ImageTile from "./image-tile.astro";
 
 interface Props {
@@ -47,22 +48,71 @@ function formatDate(date: Date) {
               <span>{data.description}</span>
             </p>
             <div
-              class="mt-2.5 text-xs text-neutral-500 dark:text-neutral-500"
+              class="mt-2.5 flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-500"
               class:list={[textHoverStyle]}
             >
-              {formatDate(data.pubDate)}
+              <span>{formatDate(data.pubDate)}</span>
             </div>
           </div>
 
-          <div class="flex w-full h-full">
-            <ImageTile
-              image={data.image}
-              alt={`${data.title} thumbnail`}
-              width="200"
-              height="200"
-              coverSize="h-full w-full sm:size-36"
-            />
-          </div>
+          {(() => {
+            const isVideo = data.contentType === "video";
+            const ytThumb = isVideo && data.videoUrl ? getYouTubeThumbnail(data.videoUrl) : "";
+            const hasImage = !!data.image;
+
+            if (hasImage) {
+              return (
+                <div class="relative w-full sm:size-36 justify-self-end">
+                  <ImageTile
+                    image={data.image}
+                    alt={`${data.title} thumbnail`}
+                    width="200"
+                    height="200"
+                    coverSize="h-full w-full sm:size-36"
+                  />
+                  {isVideo && (
+                    <div class="absolute inset-0 flex items-center justify-center rounded-xl">
+                      <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-sm">
+                        <svg class="w-4 h-4 text-neutral-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            if (isVideo && ytThumb) {
+              return (
+                <div class="relative w-full sm:size-36 justify-self-end overflow-hidden rounded-xl">
+                  <img
+                    src={ytThumb}
+                    alt={`${data.title} thumbnail`}
+                    width="200"
+                    height="200"
+                    loading="lazy"
+                    class="rounded-xl object-cover w-full h-full transition-all duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div class="absolute inset-0 flex items-center justify-center rounded-xl">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-sm">
+                      <svg class="w-4 h-4 text-neutral-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            if (isVideo) {
+              return (
+                <div class="hidden sm:flex relative items-center justify-center size-36 rounded-xl bg-neutral-100 dark:bg-neutral-800">
+                  <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-sm">
+                    <svg class="w-4 h-4 text-neutral-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                  </div>
+                </div>
+              );
+            }
+
+            return null;
+          })()}
         </a>
       )
     })

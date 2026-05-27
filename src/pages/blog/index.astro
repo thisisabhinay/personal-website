@@ -20,22 +20,25 @@ const filteredPosts = latestPosts.filter(
       description="Dive into my musings on life and tech in my latest posts; a blend of introspection and innovation. Keep an eye out for fresh insights and updates!"
     />
 
-    <nav class="flex items-center gap-3 mt-8 mb-6" aria-label="Filter posts by year">
-      {allYears.map((year) => (
-        year === latestYear ? (
-          <span class="px-3.5 py-1.5 text-sm font-semibold rounded-full bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900">
-            {year}
-          </span>
-        ) : (
-          <a
-            href={`/blog/${year}`}
-            class="px-3.5 py-1.5 text-sm font-medium rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
-          >
-            {year}
-          </a>
-        )
-      ))}
-    </nav>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 mt-8 mb-6">
+      <nav class="flex items-center gap-2" aria-label="Filter posts by year">
+        {allYears.map((year) => (
+          year === latestYear ? (
+            <span class="px-3.5 py-1.5 text-sm font-semibold rounded-full bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900">
+              {year}
+            </span>
+          ) : (
+            <a
+              href={`/blog/${year}`}
+              class="px-3.5 py-1.5 text-sm font-medium rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+            >
+              {year}
+            </a>
+          )
+        ))}
+      </nav>
+
+    </div>
 
     <div>
       <ListPosts posts={filteredPosts} />
