@@ -1,9 +1,11 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(yarn build *)",
-      "Bash(git add *)",
-      "Bash(git commit -m ' *)"
-    ]
-  }
+	"permissions": {
+		"allow": [
+			"Bash(yarn build *)",
+			"Bash(git add *)",
+			"Bash(git commit -m ' *)",
+			"Bash(git -C /Users/abhinay/GitHub/personal/personal-website branch -a)",
+			"Bash(git -C /Users/abhinay/GitHub/personal/personal-website log --oneline main..website-v2)"
+		]
+	}
 }

@@ -1,15 +1,15 @@
 ---
 export type Skill = {
-  name: string
-  title: string
-}
+	name: string;
+	title: string;
+};
 
 interface Props {
-  list: Skill[]
-  heading?: string
+	list: Skill[];
+	heading?: string;
 }
 
-const { list, heading } = Astro.props
+const { list, heading } = Astro.props;
 ---
 
 <h2 id="heading-tech-stack" class="">{heading}</h2>

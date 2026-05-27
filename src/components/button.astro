@@ -1,5 +1,5 @@
 ---
-import { Icon } from "astro-icon/components"
+import { Icon } from "astro-icon/components";
 
 const {
   link,
@@ -8,14 +8,14 @@ const {
   class: className,
   iconLeft,
   iconRight,
-} = Astro.props
+} = Astro.props;
 
-const rel = target === "_blank" ? "noopener noreferrer" : undefined
+const rel = target === "_blank" ? "noopener noreferrer" : undefined;
 ---
 
 <a
   href={link}
-  class="w-max mt-5 btn-rounded no-underline"
+  class="w-max btn-rounded no-underline"
   class:list={[className]}
   target={target}
   rel={rel}

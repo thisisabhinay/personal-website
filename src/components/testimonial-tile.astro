@@ -1,18 +1,18 @@
 ---
-import { Picture } from "astro:assets"
+import { Picture } from "astro:assets";
 
-const { testimonial } = Astro.props
+const { testimonial } = Astro.props;
 
 const baseStyle =
-  "w-full h-full rounded-2xl transition-all duration-300 ease-out p-7 h-fit text-sm"
+	"w-full h-full rounded-2xl transition-all duration-300 ease-out p-7 h-fit text-sm";
 
-const layoutStyle = "flex flex-col gap-3"
+const layoutStyle = "flex flex-col gap-3";
 
 const borderStyle =
-  "border border-1 border-solid border-neutral-200 dark:border-neutral-800"
+	"border border-1 border-solid border-neutral-200 dark:border-neutral-800";
 
 const hoverStyle =
-  "hover:shadow-neutral-100 dark:hover:shadow-black hover:shadow-lg hover:-translate-y-1"
+	"hover:shadow-neutral-100 dark:hover:shadow-black hover:shadow-lg hover:-translate-y-1";
 ---
 
 <div class:list={[baseStyle, layoutStyle, hoverStyle, borderStyle]}>

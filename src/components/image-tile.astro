@@ -1,11 +1,11 @@
 ---
-import { Picture } from "astro:assets"
+import { Picture } from "astro:assets";
 
-const { image, height, width, alt, coverSize, styles } = Astro.props
+const { image, height, width, alt, coverSize, styles } = Astro.props;
 
-const baseStyle = "rounded-xl object-cover w-full"
-const transitionStyle = "transition-all duration-700 ease-out"
-const hoverStyle = "group-hover:scale-105"
+const baseStyle = "rounded-xl object-cover w-full";
+const transitionStyle = "transition-all duration-700 ease-out";
+const hoverStyle = "group-hover:scale-105";
 ---
 
 <div class="block w-full object-cover overflow-hidden rounded-xl" class:list={[coverSize]}>
