@@ -1,12 +1,27 @@
 ---
-import { latestPosts } from "../utils/posts"
-import ImageTile from "./image-tile.astro"
+import type { CollectionEntry } from "astro:content";
+import { latestPosts } from "../utils/posts";
+import ImageTile from "./image-tile.astro";
 
-const { count } = Astro.props
-const listPosts = latestPosts.slice(0, count)
+interface Props {
+	posts?: CollectionEntry<"blog">[];
+	count?: number;
+}
+
+const { posts, count } = Astro.props;
+let listPosts = posts ?? latestPosts;
+if (count) listPosts = listPosts.slice(0, count);
 
 const textHoverStyle =
-  "group-hover:text-neutral-900 dark:group-hover:text-neutral-100"
+	"group-hover:text-neutral-900 dark:group-hover:text-neutral-100";
+
+function formatDate(date: Date) {
+	return date.toLocaleDateString("en-GB", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+}
 ---
 
 <div class="divide-y dividerline">
@@ -29,20 +44,20 @@ const textHoverStyle =
               class="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-3"
               class:list={[textHoverStyle]}
             >
-              <span>{data.excerpt}</span>
+              <span>{data.description}</span>
             </p>
             <div
               class="mt-2.5 text-xs text-neutral-500 dark:text-neutral-500"
               class:list={[textHoverStyle]}
             >
-              {data.publishDate}
+              {formatDate(data.pubDate)}
             </div>
           </div>
 
           <div class="flex w-full h-full">
             <ImageTile
               image={data.image}
-              alt="Portfolio project thumbnail"
+              alt={`${data.title} thumbnail`}
               width="200"
               height="200"
               coverSize="h-full w-full sm:size-36"

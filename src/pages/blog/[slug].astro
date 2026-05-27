@@ -1,27 +1,27 @@
 ---
-import MainLayout from "../../layouts/main.astro"
-import type { CollectionEntry } from "astro:content"
-import { getCollection } from "astro:content"
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/main.astro";
 
 interface Props {
-  post: CollectionEntry<"blog">
+	post: CollectionEntry<"blog">;
 }
 
 export async function getStaticPaths() {
-  const blog = await getCollection("blog", ({ data }) => data.draft !== true)
+	const blog = await getCollection("blog", ({ data }) => data.draft !== true);
 
-  return blog.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }))
+	return blog.map((post) => ({
+		params: { slug: post.slug },
+		props: { post },
+	}));
 }
 
-const { post } = Astro.props
+const { post } = Astro.props;
 // const entry = await getEntry("blog", "post-1")
-const { Content } = await post.render()
+const { Content } = await post.render();
 ---
 
-<MainLayout title={post.data.title} description={post.data.excerpt} image={post.data.image}>
+<MainLayout title={post.data.title} description={post.data.description} image={post.data.image}>
   <main
     id="page-blog"
     class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900"
@@ -48,7 +48,7 @@ const { Content } = await post.render()
         <p
           class="text-sm leading-6 text-neutral-500 dark:text-neutral-400 sm:leading-7 lg:leading-8 sm:text-base lg:text-lg"
         >
-          {post.data.excerpt}
+          {post.data.description}
         </p>
       </div>
     </div>
@@ -63,9 +63,23 @@ const { Content } = await post.render()
 
 <style is:global>
   @media (min-width: 1024px) {
-    #page-blog article p:has(img) {
+    #page-blog article p:has(img),
+    #page-blog article figure:has(img) {
       margin-left: -8rem;
       margin-right: -8rem;
     }
+  }
+
+  #page-blog article p:has(img),
+  #page-blog article figure:has(img) {
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+    border-radius: 0.75rem;
+  }
+
+  #page-blog article figure:has(img) img,
+  #page-blog article p:has(img) img {
+    border-radius: 0.75rem;
   }
 </style>
