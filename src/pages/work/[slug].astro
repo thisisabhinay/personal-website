@@ -1,29 +1,32 @@
 ---
-import MainLayout from "../../layouts/main.astro"
-import type { CollectionEntry } from "astro:content"
-import { getCollection } from "astro:content"
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/main.astro";
 
 interface Props {
-  portfolio: CollectionEntry<"portfolio">
+	portfolio: CollectionEntry<"portfolio">;
 }
 
 export async function getStaticPaths() {
-  const list = await getCollection("portfolio", ({ data }) => data.draft !== true)
+	const list = await getCollection(
+		"portfolio",
+		({ data }) => data.draft !== true,
+	);
 
-  return list.map((portfolio) => ({
-    params: { slug: portfolio.slug },
-    props: { portfolio },
-  }))
+	return list.map((portfolio) => ({
+		params: { slug: portfolio.slug },
+		props: { portfolio },
+	}));
 }
 
-const { portfolio } = Astro.props
+const { portfolio } = Astro.props;
 
-const { Content } = await portfolio.render()
+const { Content } = await portfolio.render();
 ---
 
 <MainLayout title={portfolio.data.title} description={portfolio.data.description} image={portfolio.data.image}>
   <main
-    id="page-portfolio"
+    id="page-work"
     class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900"
   >
     <div
@@ -63,12 +66,12 @@ const { Content } = await portfolio.render()
 
 <style is:global>
   @media (min-width: 1024px) {
-    #page-portfolio article p:has(img) {
+    #page-work article p:has(img) {
       margin-left: -8rem;
       margin-right: -8rem;
     }
 
-    #page-portfolio article p:has(img):first-child {
+    #page-work article p:has(img):first-child {
       margin-bottom: 3rem;
     }
   }

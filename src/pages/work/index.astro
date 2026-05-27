@@ -1,0 +1,21 @@
+---
+import ListProjects from "../../components/list-projects.astro";
+import PageHeading from "../../components/page-heading.astro";
+import companies from "../../data/clients.json";
+import Layout from "../../layouts/main.astro";
+---
+
+<Layout title="Work" description="Explore my latest projects showcasing creativity and technical expertise in frontend engineering.">
+  <section class="relative z-20 max-w-2xl mx-auto my-12 px-7 lg:px-0">
+    <PageHeading
+      title="Work"
+      description="I am passionate about transforming new ideas into reality through innovative projects. Explore my latest works showcasing both creativity and technical expertise."
+    />
+
+    {
+      companies?.map(({ name, logo }) => (
+        <ListProjects company={name} brandLogo={logo} />
+      ))
+    }
+  </section>
+</Layout>

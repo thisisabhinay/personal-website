@@ -1,15 +1,15 @@
 ---
-import Project from "../components/project.astro"
-import { pinnedPortfolio } from "../utils/portfolio"
+import Project from "../components/project.astro";
+import { pinnedPortfolio } from "../utils/portfolio";
 
 interface Props {
-  count: number
-  className?: string
+	count: number;
+	className?: string;
 }
 
-const { count, className = "" } = Astro.props
+const { count, className = "" } = Astro.props;
 
-const portfolio = count ? pinnedPortfolio.slice(0, count) : pinnedPortfolio
+const portfolio = count ? pinnedPortfolio.slice(0, count) : pinnedPortfolio;
 ---
 
 <div
@@ -26,8 +26,7 @@ const portfolio = count ? pinnedPortfolio.slice(0, count) : pinnedPortfolio
             image={project.data.image}
             company={project.data.company}
             slug={project.slug}
-            layout="card"
-            hrefBase="portfolio"
+            hrefBase="/work"
           />
         </Fragment>
       )

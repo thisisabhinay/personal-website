@@ -1,48 +1,41 @@
 ---
-import Project from "../components/project.astro"
-import Separator from "../components/separator.astro"
-import { latestPortfolio } from "../utils/portfolio"
+import Project from "../components/project.astro";
+import Separator from "../components/separator.astro";
+import { latestPortfolio } from "../utils/portfolio";
 
 interface Props {
-  count?: number
-  className?: string
-  company?: string
-  brandLogo?: string
+	count?: number;
+	className?: string;
+	company?: string;
+	brandLogo?: string;
 }
 
-const { count, company, brandLogo, className = "" } = Astro.props
+const { count, company, brandLogo, className = "" } = Astro.props;
 
-let portfolio
-portfolio = company
-  ? latestPortfolio.filter((project) => project.data.company === company)
-  : latestPortfolio
+const filtered = company
+	? latestPortfolio.filter((project) => project.data.company === company)
+	: latestPortfolio;
 
-portfolio = count ? portfolio.slice(0, count) : portfolio
-
-const collection = portfolio
-
+const collection = count ? filtered.slice(0, count) : filtered;
 ---
 
 {company ? <Separator text={company} brandLogo={brandLogo} /> : null}
 
 <div
-  class="divide-y dividerline"
+  class="grid grid-cols-1 sm:grid-cols-2 gap-7"
   class:list={[className, !company ? "mt-20" : ""]}
 >
   {
     collection.map((project: any) => {
       return (
-        <div class="py-4 first:pt-0">
-          <Project
-            name={project.data.title}
-            description={project.data.description}
-            image={project.data.image}
-            company={project.data.company}
-            slug={project.slug}
-            hrefBase="portfolio"
-            layout="list"
-          />
-        </div>
+        <Project
+          name={project.data.title}
+          description={project.data.description}
+          image={project.data.image}
+          company={project.data.company}
+          slug={project.slug}
+          hrefBase="/work"
+        />
       )
     })
   }
