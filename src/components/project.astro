@@ -1,6 +1,18 @@
 ---
 import ImageTile from "./image-tile.astro"
 
+type Layout = "card" | "list"
+
+interface Props {
+  name: string
+  description: string
+  slug: string
+  image?: string
+  company: string
+  layout?: Layout
+  hrefBase: string
+}
+
 const {
   name,
   description,
@@ -13,27 +25,27 @@ const {
 
 const baseStyle = "w-full h-full rounded-xl"
 
-const layoutStyle: any = {
+const layoutStyle: Record<Layout, string> = {
   card: "flex flex-col gap-3",
   list: "flex flex-row-reverse gap-3 justify-between",
 }
 
-const coverSize: any = {
+const coverSize: Record<Layout, string> = {
   card: "h-48 md:h-36",
   list: "h-48 md:h-44",
 }
 
-const headingStyle: any = {
+const headingStyle: Record<Layout, string> = {
   card: "text-base line-clamp-2",
   list: "text-lg",
 }
 
-const descriptionClamp: any = {
+const descriptionClamp: Record<Layout, string> = {
   card: "line-clamp-5 md:line-clamp-3",
   list: "line-clamp-4 md:line-clamp-3",
 }
 
-const visibility: any = {
+const visibility: Record<Layout, string> = {
   card: "!hidden",
   list: "",
 }

@@ -4,8 +4,20 @@ import StatusTag from "./status-tag.astro"
 
 type Tag = "default" | "dark" | "red" | "green" | "yellow"
 type Status = "Planning" | "Backlog" | "On hold" | "Live" | "In progress"
+type Layout = "card" | "list"
 type TagMap = {
   [K in Status]: Tag
+}
+
+interface Props {
+  name: string
+  description: string
+  slug: string
+  image?: string
+  domains: string
+  layout?: Layout
+  status: Status
+  hrefBase: string
 }
 
 const {
@@ -21,45 +33,45 @@ const {
 
 const baseStyle = "w-full h-full rounded-2xl"
 
-const statusMap = {
+const statusMap: TagMap = {
   "In progress": "default",
   "Live": "green",
   "Backlog": "dark",
   "On hold": "red",
   "Planning": "yellow",
-} as TagMap
+}
 
-const layoutStyle: any = {
+const layoutStyle: Record<Layout, string> = {
   card: "flex flex-col gap-3",
   list: "flex flex-row-reverse gap-3 justify-between",
 }
 
-const coverSize: any = {
+const coverSize: Record<Layout, string> = {
   card: "w-full h-48 md:h-36",
   list: "w-full h-48 md:h-44",
 }
 
-const headingStyle: any = {
+const headingStyle: Record<Layout, string> = {
   card: "text-base line-clamp-2",
   list: "text-lg",
 }
 
-const clampStyle: any = {
+const clampStyle: Record<Layout, string> = {
   card: "line-clamp-5 md:line-clamp-3",
   list: "line-clamp-4 md:line-clamp-3",
 }
 
-const statusCardLayout: any = {
+const statusCardLayout: Record<Layout, string> = {
   card: "block -mt-2",
   list: "hidden",
 }
 
-const statusListLayout: any = {
+const statusListLayout: Record<Layout, string> = {
   card: "hidden",
   list: "block",
 }
 
-const visibility: any = {
+const visibility: Record<Layout, string> = {
   card: "!hidden",
   list: "",
 }
