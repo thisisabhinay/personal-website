@@ -2,6 +2,7 @@
 import Button from "../../components/button.astro";
 import ListPosts from "../../components/list-posts.astro";
 import PageHeading from "../../components/page-heading.astro";
+import YearFilter from "../../components/year-filter.astro";
 import Layout from "../../layouts/main.astro";
 import {
 	formatCollectionName,
@@ -11,9 +12,11 @@ import { latestPosts } from "../../utils/posts";
 
 export function getStaticPaths() {
 	const collectionSet = new Set<string>();
-	latestPosts.forEach((post) => {
-		post.data.collections?.forEach((col: string) => collectionSet.add(col));
-	});
+	for (const post of latestPosts) {
+		for (const col of post.data.collections ?? []) {
+			collectionSet.add(col);
+		}
+	}
 
 	return Array.from(collectionSet).map((name) => {
 		const filtered = latestPosts.filter((post) =>
@@ -42,6 +45,7 @@ const description = `${posts.length} post${posts.length === 1 ? "" : "s"}${
     />
 
     <div class="mt-7">
+      <YearFilter posts={posts} />
       <ListPosts posts={posts} />
     </div>
 

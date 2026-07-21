@@ -2,14 +2,17 @@
 import Button from "../../components/button.astro";
 import ListPosts from "../../components/list-posts.astro";
 import PageHeading from "../../components/page-heading.astro";
+import YearFilter from "../../components/year-filter.astro";
 import Layout from "../../layouts/main.astro";
 import { latestPosts } from "../../utils/posts";
 
 export function getStaticPaths() {
 	const tagSet = new Set<string>();
-	latestPosts.forEach((post) => {
-		post.data.tags?.forEach((tag: string) => tagSet.add(tag));
-	});
+	for (const post of latestPosts) {
+		for (const tag of post.data.tags ?? []) {
+			tagSet.add(tag);
+		}
+	}
 
 	return Array.from(tagSet).map((tag) => {
 		const filtered = latestPosts.filter((post) =>
@@ -33,6 +36,7 @@ const { tag, posts } = Astro.props;
     />
 
     <div class="mt-7">
+      <YearFilter posts={posts} />
       <ListPosts posts={posts} />
     </div>
 

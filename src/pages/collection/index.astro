@@ -1,16 +1,23 @@
 ---
 import PageHeading from "../../components/page-heading.astro";
+import TopicThumbnail from "../../components/topic-thumbnail.astro";
 import Layout from "../../layouts/main.astro";
 import { formatCollectionName, getCollectionDescription } from "../../utils/collections";
 import { latestPosts } from "../../utils/posts";
 
 const collectionCounts = new Map<string, number>();
+const collectionImages = new Map<string, string[]>();
 
-latestPosts.forEach((post) => {
-	post.data.collections?.forEach((col: string) => {
+for (const post of latestPosts) {
+	for (const col of post.data.collections ?? []) {
 		collectionCounts.set(col, (collectionCounts.get(col) || 0) + 1);
-	});
-});
+		if (post.data.image) {
+			const imgs = collectionImages.get(col) || [];
+			if (imgs.length < 4) imgs.push(post.data.image);
+			collectionImages.set(col, imgs);
+		}
+	}
+}
 
 const sortedCollections = [...collectionCounts.entries()].sort(
 	(a, b) => b[1] - a[1],
@@ -28,22 +35,26 @@ const sortedCollections = [...collectionCounts.entries()].sort(
       <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sortedCollections.map(([name, count]) => {
           const desc = getCollectionDescription(name);
+          const images = collectionImages.get(name) || [];
           return (
             <a
               href={`/collection/${name}`}
-              class="block group p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors"
+              class="block group overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors"
             >
-              <h2 class="text-base font-semibold text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 transition-colors">
-                {formatCollectionName(name)}
-              </h2>
-              <span class="text-xs text-neutral-400 dark:text-neutral-500">
-                {count} post{count === 1 ? "" : "s"}
-              </span>
-              {desc && (
-                <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2">
-                  {desc}
-                </p>
-              )}
+              {images.length > 0 && <TopicThumbnail images={images} />}
+              <div class="p-5">
+                <h2 class="text-base font-semibold text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 transition-colors">
+                  {formatCollectionName(name)}
+                </h2>
+                <span class="text-xs text-neutral-400 dark:text-neutral-500">
+                  {count} post{count === 1 ? "" : "s"}
+                </span>
+                {desc && (
+                  <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2">
+                    {desc}
+                  </p>
+                )}
+              </div>
             </a>
           );
         })}

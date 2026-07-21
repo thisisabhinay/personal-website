@@ -1,0 +1,75 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  posts: CollectionEntry<"blog">[];
+}
+
+const { posts } = Astro.props;
+const allYears = [...new Set(posts.map((p) => p.data.pubDate.getFullYear()))].sort((a, b) => b - a);
+---
+
+{allYears.length > 1 && (
+  <div class="flex flex-wrap items-center gap-2 mb-6" data-comp="year-filter">
+    <button
+      type="button"
+      data-year="all"
+      class="px-3 py-1 text-xs rounded-full bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 font-semibold transition-colors"
+    >
+      All
+    </button>
+    {allYears.map((year) => (
+      <button
+        type="button"
+        data-year={year.toString()}
+        class="px-3 py-1 text-xs rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+      >
+        {year}
+      </button>
+    ))}
+  </div>
+)}
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const filter = document.querySelector('[data-comp="year-filter"]');
+    if (!filter) return;
+
+    const buttons = filter.querySelectorAll("button");
+    const container = filter.nextElementSibling;
+    if (!container) return;
+
+    const items = [...container.querySelectorAll("[data-pub-year]")];
+    const activeClasses = ["bg-neutral-900", "dark:bg-neutral-100", "text-white", "dark:text-neutral-900", "font-semibold"];
+    const inactiveClasses = ["text-neutral-400", "hover:text-neutral-900", "dark:hover:text-neutral-100"];
+
+    function setActive(btn: Element) {
+      for (const b of buttons) {
+        b.classList.remove(...activeClasses);
+        b.classList.add(...inactiveClasses);
+      }
+      btn.classList.add(...activeClasses);
+      btn.classList.remove(...inactiveClasses);
+    }
+
+    for (const btn of buttons) {
+      btn.addEventListener("click", () => {
+        const year = btn.getAttribute("data-year");
+        setActive(btn);
+
+        const fragment = document.createDocumentFragment();
+        for (const item of items) {
+          if (year === "all" || item.getAttribute("data-pub-year") === year) {
+            fragment.appendChild(item);
+          }
+        }
+        for (const item of items) {
+          if (year !== "all" && item.getAttribute("data-pub-year") !== year) {
+            item.remove();
+          }
+        }
+        container.prepend(fragment);
+      });
+    }
+  });
+</script>

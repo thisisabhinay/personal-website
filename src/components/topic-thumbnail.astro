@@ -1,0 +1,20 @@
+---
+interface Props {
+  images: string[];
+}
+
+const { images } = Astro.props;
+const visibleImages = images.slice(0, 4);
+const count = visibleImages.length;
+---
+
+{count > 0 && (
+  <div
+    class="w-full overflow-hidden rounded-xl"
+    style={`aspect-ratio: 3/2; display: grid; grid-template-columns: repeat(${count}, 1fr);`}
+  >
+    {visibleImages.map((src) => (
+      <img src={src} alt="" loading="lazy" class="w-full h-full object-cover" />
+    ))}
+  </div>
+)}

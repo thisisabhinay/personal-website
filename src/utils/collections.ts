@@ -1,4 +1,4 @@
-type CollectionMeta = {
+export type CollectionMeta = {
 	label: string;
 	description: string;
 };
@@ -24,4 +24,11 @@ export function formatCollectionName(slug: string): string {
 
 export function getCollectionDescription(slug: string): string | undefined {
 	return collectionMeta[slug]?.description;
+}
+
+export function getAllCollections(): Array<{ slug: string } & CollectionMeta> {
+	return Object.entries(collectionMeta).map(([slug, meta]) => ({
+		slug,
+		...meta,
+	}));
 }
