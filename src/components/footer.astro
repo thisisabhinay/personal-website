@@ -1,7 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
 import Logo from "../components/logo.astro";
-import Button from "./button.astro";
 
 const currentYear = new Date().getFullYear();
 ---
@@ -19,36 +18,27 @@ const currentYear = new Date().getFullYear();
       &copy; {currentYear} Abhinay Thakur. All rights are reserved.
     </p>
     <div
-      class="flex flex-col sm:flex-row items-center justify-center mt-4 gap-5 sm:ml-auto sm:mt-0 sm:justify-start"
+      class="flex items-center justify-center mt-4 gap-5 sm:ml-auto sm:mt-0 sm:justify-start"
     >
-      <Button
-        text="Schedule a meeting"
-        link="https://calendar.app.google/T8V2fr9b9mxMGyzAA"
+      <a
+        href="https://twitter.com/thisisabhinay"
         target="_blank"
-        class="!mt-0"
-      />
+        rel="noopener noreferrer"
+        class="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+      >
+        <span class="sr-only">X</span>
+        <Icon name="x" class="text-3xl" />
+      </a>
 
-      <div class="flex items-center gap-5">
-        <a
-          href="https://twitter.com/thisisabhinay"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-        >
-          <span class="sr-only">𝕏</span>
-          <Icon name="x" class="text-3xl" />
-        </a>
-
-        <a
-          href="https://github.com/thisisabhinay"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-        >
-          <span class="sr-only">GitHub</span>
-          <Icon name="github" class="text-3xl" />
-        </a>
-      </div>
+      <a
+        href="https://github.com/thisisabhinay"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+      >
+        <span class="sr-only">GitHub</span>
+        <Icon name="github" class="text-3xl" />
+      </a>
     </div>
   </div>
 </section>
