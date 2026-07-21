@@ -1,6 +1,15 @@
 ---
 import { Picture } from "astro:assets";
 
+interface Props {
+	image?: string;
+	alt: string;
+	width: `${number}`;
+	height: `${number}`;
+	coverSize?: string;
+	styles?: string;
+}
+
 const { image, height, width, alt, coverSize, styles } = Astro.props;
 
 const baseStyle = "rounded-xl object-cover w-full";
@@ -8,13 +17,15 @@ const transitionStyle = "transition-all duration-700 ease-out";
 const hoverStyle = "group-hover:scale-105";
 ---
 
-<div class="block w-full object-cover overflow-hidden rounded-xl" class:list={[coverSize]}>
-  <Picture
-    src={image}
-    formats={["avif", "webp", "jpg"]}
-    alt={alt}
-    width={width}
-    height={height}
-    class:list={[baseStyle, transitionStyle, hoverStyle, coverSize, styles]}
-  />
-</div>
+{image && (
+	<div class="block w-full object-cover overflow-hidden rounded-xl" class:list={[coverSize]}>
+		<Picture
+			src={image}
+			formats={["avif", "webp", "jpg"]}
+			alt={alt}
+			width={width}
+			height={height}
+			class:list={[baseStyle, transitionStyle, hoverStyle, coverSize, styles]}
+		/>
+	</div>
+)}

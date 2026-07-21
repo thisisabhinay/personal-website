@@ -6,3 +6,11 @@ export const latestPosts = (
 		return data.draft !== true;
 	})
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+export function formatDate(date: Date): string {
+	return date.toLocaleDateString("en-GB", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+}

@@ -1,8 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { latestPosts } from "../utils/posts";
+import { latestPosts, formatDate } from "../utils/posts";
 import { getYouTubeThumbnail } from "../utils/youtube";
 import ImageTile from "./image-tile.astro";
+import PlayOverlay from "./play-overlay.astro";
 
 interface Props {
 	posts?: CollectionEntry<"blog">[];
@@ -16,22 +17,20 @@ if (count) listPosts = listPosts.slice(0, count);
 const textHoverStyle =
 	"group-hover:text-neutral-900 dark:group-hover:text-neutral-100";
 
-function formatDate(date: Date) {
-	return date.toLocaleDateString("en-GB", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	});
+function thumbnailOf(imagePath: string | undefined): string | undefined {
+	if (!imagePath?.startsWith("/assets/blog/covers/")) return imagePath;
+	return imagePath.replace("/assets/blog/covers/", "/assets/blog/covers/thumbnail_");
 }
 ---
 
-<div class="divide-y dividerline">
+<div class="flex flex-col gap-4">
   {
     listPosts.map(({ slug, data }) => {
       return (
         <a
           href={`/blog/${slug}`}
-          class="relative group py-4 first:pt-0 last:pb-0 grid grid-rows-1 grid-cols-1 sm:grid-cols-[3fr_1fr] gap-7 justify-items-end"
+          data-pub-year={data.pubDate.getFullYear().toString()}
+          class="relative group grid grid-rows-1 grid-cols-1 sm:grid-cols-[3fr_1fr] gap-7 justify-items-end"
         >
           <div>
             <h2 class="flex items-start gap-1 mb-3">
@@ -62,28 +61,22 @@ function formatDate(date: Date) {
 
             if (hasImage) {
               return (
-                <div class="relative w-full sm:size-36 justify-self-end">
+                <div class="relative w-full aspect-video sm:aspect-auto sm:size-36 justify-self-end overflow-hidden">
                   <ImageTile
-                    image={data.image}
+                    image={thumbnailOf(data.image)}
                     alt={`${data.title} thumbnail`}
                     width="200"
                     height="200"
                     coverSize="h-full w-full sm:size-36"
                   />
-                  {isVideo && (
-                    <div class="absolute inset-0 flex items-center justify-center rounded-xl">
-                      <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-sm">
-                        <svg class="w-4 h-4 text-neutral-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                      </div>
-                    </div>
-                  )}
+                  {isVideo && <PlayOverlay />}
                 </div>
               );
             }
 
             if (isVideo && ytThumb) {
               return (
-                <div class="relative w-full sm:size-36 justify-self-end overflow-hidden rounded-xl">
+                <div class="relative w-full aspect-video sm:aspect-auto sm:size-36 justify-self-end overflow-hidden rounded-xl">
                   <img
                     src={ytThumb}
                     alt={`${data.title} thumbnail`}
@@ -92,11 +85,7 @@ function formatDate(date: Date) {
                     loading="lazy"
                     class="rounded-xl object-cover w-full h-full transition-all duration-700 ease-out group-hover:scale-105"
                   />
-                  <div class="absolute inset-0 flex items-center justify-center rounded-xl">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-sm">
-                      <svg class="w-4 h-4 text-neutral-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                    </div>
-                  </div>
+                  <PlayOverlay />
                 </div>
               );
             }
