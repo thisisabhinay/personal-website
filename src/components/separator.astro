@@ -1,4 +1,9 @@
 ---
+interface Props {
+	brandLogo?: string;
+	text: string;
+}
+
 const { brandLogo, text } = Astro.props;
 
 const fontStyle = "text-neutral-500 dark:text-neutral-400 font-semibold";
@@ -23,7 +28,7 @@ const borderStyle = "border-neutral-200 dark:border-neutral-800";
     {
       brandLogo ? (
         <div class="flex items-center justify-center mr-1 w-5 h-5 translate-x-1">
-          <img src={brandLogo} class="size-4" />
+          <img src={brandLogo} width="16" height="16" alt="" class="size-4" />
         </div>
       ) : null
     }
