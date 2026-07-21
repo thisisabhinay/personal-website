@@ -18,7 +18,7 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="overflow-x-hidden" style="--wip-h: 1.9rem">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -75,7 +75,22 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     {import.meta.env.DEV && <Fragment set:html={import.meta.env.HEADER_INJECT} />}
   </head>
-  <body class="antialiased bg-white dark:bg-neutral-950 min-h-screen flex flex-col">
+  <body class="antialiased bg-white dark:bg-neutral-950 min-h-screen flex flex-col overflow-x-hidden">
+    <div
+      class="fixed top-0 left-0 right-0 z-[9999] w-full overflow-hidden bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300 text-neutral-900"
+      style="height: var(--wip-h)"
+    >
+      <div class="flex items-center justify-center h-full gap-2 px-4 whitespace-nowrap">
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-900">
+          🚧 Work in progress
+        </span>
+        <span class="hidden sm:inline-block h-3.5 w-px bg-amber-900/30"></span>
+        <span class="text-[13px] font-medium tracking-tight">
+          Some content is still being updated. Thanks for your patience.
+        </span>
+      </div>
+    </div>
+    <div aria-hidden="true" style="height: var(--wip-h)"></div>
     <SquareLines />
     <Header />
     <div class="flex-1">
