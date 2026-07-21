@@ -1,0 +1,118 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import ImageTile from "./image-tile.astro";
+
+interface Props {
+  currentPost: CollectionEntry<"blog">;
+}
+
+const MAX_CARDS = 6;
+const { currentPost } = Astro.props;
+
+const allPosts = await getCollection("blog", ({ data }) => data.draft !== true);
+const others = allPosts.filter((p) => p.slug !== currentPost.slug);
+
+const currentTags = new Set(currentPost.data.tags);
+const currentCollections = new Set(currentPost.data.collections);
+
+const scored = others
+  .map((post) => {
+    let score = 0;
+    for (const col of post.data.collections) {
+      if (currentCollections.has(col)) score += 2;
+    }
+    for (const tag of post.data.tags) {
+      if (currentTags.has(tag)) score += 1;
+    }
+    return { post, score };
+  })
+  .filter(({ score }) => score > 0)
+  .sort((a, b) => b.score - a.score || b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf())
+  .slice(0, MAX_CARDS);
+
+function thumbnailOf(imagePath: string | undefined): string | undefined {
+  if (!imagePath?.startsWith("/assets/blog/covers/")) return imagePath;
+  return imagePath.replace("/assets/blog/covers/", "/assets/blog/covers/thumbnail_");
+}
+---
+
+{scored.length > 0 && (
+  <section class="w-full max-w-4xl mx-auto mt-12 mb-8 px-7 lg:px-0">
+    <h2 class="text-lg font-semibold mb-5 dark:text-neutral-100">Related Posts</h2>
+    <div class="relative">
+      <button
+        type="button"
+        data-comp="scroll-left"
+        class="hidden absolute left-0 top-[4.5rem] -translate-x-4 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm items-center justify-center hover:bg-neutral-50 dark:hover:bg-neutral-700"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+      <div data-comp="scroll-container" class="flex gap-4 overflow-x-auto pb-2" style="scrollbar-width: none; -ms-overflow-style: none;">
+        {scored.map(({ post }) => (
+          <a
+            href={`/blog/${post.slug}`}
+            class="group flex-shrink-0 w-56 flex flex-col"
+          >
+            {post.data.image && (
+              <div class="w-full aspect-video overflow-hidden rounded-xl">
+                <img
+                  src={thumbnailOf(post.data.image)}
+                  alt={post.data.title}
+                  loading="lazy"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+            )}
+            <h3 class="mt-2 text-sm font-medium leading-snug text-neutral-800 dark:text-neutral-200 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 line-clamp-2">
+              {post.data.title}
+            </h3>
+            <span class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
+              {post.data.pubDate.toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" })}
+            </span>
+          </a>
+        ))}
+      </div>
+      <button
+        type="button"
+        data-comp="scroll-right"
+        class="hidden absolute right-0 top-[4.5rem] translate-x-4 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm items-center justify-center hover:bg-neutral-50 dark:hover:bg-neutral-700"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+  </section>
+)}
+
+<style>
+  [data-comp="scroll-container"]::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const container = document.querySelector('[data-comp="scroll-container"]') as HTMLElement | null;
+    if (!container) return;
+
+    const leftBtn = document.querySelector('[data-comp="scroll-left"]') as HTMLElement | null;
+    const rightBtn = document.querySelector('[data-comp="scroll-right"]') as HTMLElement | null;
+    if (!leftBtn || !rightBtn) return;
+
+    function updateButtons() {
+      const { scrollLeft, scrollWidth, clientWidth } = container!;
+      leftBtn!.style.display = scrollLeft > 0 ? "flex" : "none";
+      rightBtn!.style.display = scrollLeft + clientWidth < scrollWidth - 1 ? "flex" : "none";
+    }
+
+    container.addEventListener("scroll", updateButtons);
+    updateButtons();
+
+    leftBtn.addEventListener("click", () => {
+      container.scrollBy({ left: -240, behavior: "smooth" });
+    });
+    rightBtn.addEventListener("click", () => {
+      container.scrollBy({ left: 240, behavior: "smooth" });
+    });
+  });
+</script>

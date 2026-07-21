@@ -1,8 +1,10 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
+import RelatedPosts from "../../components/related-posts.astro";
 import TagList from "../../components/tag-list.astro";
 import MainLayout from "../../layouts/main.astro";
+import { formatDate } from "../../utils/posts";
 import { getYouTubeId } from "../../utils/youtube";
 
 interface Props {
@@ -21,6 +23,12 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await post.render();
 const isVideo = post.data.contentType === "video";
+const coverSize = post.data.coverSize ?? "large";
+const coverClasses: Record<string, string> = {
+	full: "w-screen relative left-1/2 -translate-x-1/2 my-8 md:my-12",
+	large: "w-full max-w-4xl mx-auto my-8 md:my-12 px-7 lg:px-0",
+	default: "w-full max-w-2xl mx-auto my-8 md:my-12 px-7 sm:px-0",
+};
 ---
 
 <MainLayout title={post.data.title} description={post.data.description} image={post.data.image}>
@@ -29,7 +37,7 @@ const isVideo = post.data.contentType === "video";
     class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900"
   >
     <div
-      class="relative flex flex-col px-5 pb-6 md:pb-0 pt-6 border-t border-b-0 md:border-r md:border-l md:pt-20 lg:px-0 justify-stretch md:rounded-t-2xl border-neutral-200 dark:border-neutral-800"
+      class="relative flex flex-col px-5 pb-6 md:pb-0 pt-6 border-b-0 md:border-t md:border-r md:border-l md:pt-20 lg:px-0 justify-stretch md:rounded-t-2xl border-neutral-200 dark:border-neutral-800"
     >
       <div
         class="absolute top-0 left-0 hidden w-px h-full mt-1 -translate-x-px md:block bg-gradient-to-b from-transparent to-white dark:to-neutral-950"
@@ -40,7 +48,7 @@ const isVideo = post.data.contentType === "video";
       >
       </div>
       <div
-        class="flex flex-col items-start gap-5 mx-auto w-full max-w-2xl md:mb-12"
+        class="flex flex-col items-start gap-5 mx-auto w-full max-w-2xl"
       >
         <h1
           class="text-3xl font-bold leading-tight tracking-tighter text-left md:text-4xl dark:text-neutral-100 lg:text-5xl md:leading-none"
@@ -55,7 +63,7 @@ const isVideo = post.data.contentType === "video";
 
         <div class="flex flex-wrap items-center gap-2 text-xs text-neutral-400 dark:text-neutral-500">
           <time datetime={post.data.pubDate.toISOString().split("T")[0]}>
-            {post.data.pubDate.toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" })}
+            {formatDate(post.data.pubDate)}
           </time>
           {isVideo && post.data.duration && (
             <>
@@ -74,15 +82,37 @@ const isVideo = post.data.contentType === "video";
       </div>
     </div>
 
+    {post.data.image && (
+      <div class={coverClasses[coverSize]}>
+        <div class="bg-neutral-100 dark:bg-neutral-800 overflow-hidden rounded-xl" style="aspect-ratio: 40/21">
+          <img
+            src={post.data.image}
+            alt={post.data.title}
+            width="1200"
+            height="630"
+            class="w-full h-full object-cover"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+        {post.data.coverCaption && (
+          <p class="mt-2 text-xs text-center text-neutral-400 dark:text-neutral-500">{post.data.coverCaption}</p>
+        )}
+      </div>
+    )}
+
     {isVideo && post.data.videoUrl && (
       <div id="yt-embed" class="w-full max-w-2xl mx-auto mb-4 px-7 sm:px-0">
         <div class="w-full rounded-xl overflow-hidden aspect-video min-h-[24rem]">
           <iframe
-            id="yt-player"
+            data-comp="yt-player"
             src={`https://www.youtube.com/embed/${getYouTubeId(post.data.videoUrl)}?enablejsapi=1`}
             title={post.data.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
+            loading="lazy"
+            sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
             class="w-full h-full"
           />
         </div>
@@ -90,10 +120,12 @@ const isVideo = post.data.contentType === "video";
     )}
 
     <article
-      class="w-full max-w-2xl mx-auto mb-20 prose-sm prose px-7 sm:px-0 lg:prose-lg dark:prose-invert"
+      class="w-full max-w-2xl mx-auto mb-12 prose-sm prose px-7 sm:px-0 lg:prose-lg dark:prose-invert"
     >
       <Content />
     </article>
+
+    <RelatedPosts currentPost={post} />
   </main>
 </MainLayout>
 
@@ -123,20 +155,31 @@ const isVideo = post.data.contentType === "video";
   #page-blog article p:has(img) img {
     border-radius: 0.75rem;
   }
+
+  #page-blog article > p:first-of-type::first-letter {
+    float: left;
+    font-size: 3.5em;
+    line-height: 0.8;
+    font-weight: 600;
+    margin-right: 0.08em;
+    margin-top: 0.05em;
+  }
 </style>
 
 <script>
-  document.querySelectorAll('[data-seek-time]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const seconds = Number(btn.getAttribute('data-seek-time'));
-      const iframe = document.getElementById('yt-player') as HTMLIFrameElement | null;
-      if (iframe) {
-        iframe.contentWindow?.postMessage(
-          JSON.stringify({ event: 'command', func: 'seekTo', args: [seconds, true] }),
-          '*'
-        );
-        iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    });
+  document.addEventListener("astro:page-load", () => {
+    for (const btn of document.querySelectorAll("[data-seek-time]")) {
+      btn.addEventListener("click", () => {
+        const seconds = Number(btn.getAttribute("data-seek-time"));
+        const iframe = document.querySelector('[data-comp="yt-player"]') as HTMLIFrameElement | null;
+        if (iframe) {
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({ event: "command", func: "seekTo", args: [seconds, true] }),
+            "https://www.youtube.com"
+          );
+          iframe.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      });
+    }
   });
 </script>

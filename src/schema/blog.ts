@@ -12,6 +12,8 @@ const blogSchema = z.object({
 	contentType: z.enum(["article", "video"]).default("article"),
 	videoUrl: z.string().optional(),
 	duration: z.string().optional(),
+	coverSize: z.enum(["default", "large", "full"]).default("large"),
+	coverCaption: z.string().optional(),
 });
 
 export default blogSchema;
